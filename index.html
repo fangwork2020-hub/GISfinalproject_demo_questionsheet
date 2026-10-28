@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boston Housing Equity — Interactive Worksheet</title>
+<style>
+  :root {
+    --bg: #f7f8f9;
+    --surface: #ffffff;
+    --text: #1d2327;
+    --text-muted: #5b6670;
+    --accent: #1F4E5F;
+    --accent-text: #ffffff;
+    --border: #d8dee2;
+    --hint-bg: #f0f0f0;
+    --hint-border: #bfbfbf;
+    --callout-bg: #fff4e5;
+    --callout-border: #e8a33d;
+    --answer-bg: #e7f0f3;
+    --answer-border: #1F4E5F;
+    --input-bg: #ffffff;
+    --btn-disabled-bg: #c9d2d6;
+    --btn-disabled-text: #7a8389;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14181b;
+      --surface: #1d2327;
+      --text: #ecf0f2;
+      --text-muted: #a6b0b6;
+      --accent: #3f90ad;
+      --accent-text: #0b1113;
+      --border: #313a40;
+      --hint-bg: #262c30;
+      --hint-border: #3d454b;
+      --callout-bg: #332a18;
+      --callout-border: #c98a2c;
+      --answer-bg: #1b2b32;
+      --answer-border: #3f90ad;
+      --input-bg: #101517;
+      --btn-disabled-bg: #2b3338;
+      --btn-disabled-text: #6b7479;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14181b;
+    --surface: #1d2327;
+    --text: #ecf0f2;
+    --text-muted: #a6b0b6;
+    --accent: #3f90ad;
+    --accent-text: #0b1113;
+    --border: #313a40;
+    --hint-bg: #262c30;
+    --hint-border: #3d454b;
+    --callout-bg: #332a18;
+    --callout-border: #c98a2c;
+    --answer-bg: #1b2b32;
+    --answer-border: #3f90ad;
+    --input-bg: #101517;
+    --btn-disabled-bg: #2b3338;
+    --btn-disabled-text: #6b7479;
+  }
+
+  * { box-sizing: border-box; }
+  html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 18px 60px;
+  }
+  h1 {
+    font-size: 1.7rem;
+    margin: 0 0 4px;
+    color: var(--accent);
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0 0 20px;
+    font-size: 0.95rem;
+  }
+  p { margin: 0 0 14px; }
+  .callout {
+    background: var(--callout-bg);
+    border: 1px solid var(--callout-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 0 0 18px;
+    font-size: 0.95rem;
+  }
+  .callout b, .hint b, .answer-box b { color: inherit; }
+  label.field-label {
+    display: block;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    font-size: 0.92rem;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    background: var(--input-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 11px;
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  input[type="text"]:focus, textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .q-banner {
+    background: var(--accent);
+    color: var(--accent-text);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 34px 0 16px;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .q-banner span.num { opacity: 0.85; font-weight: 700; margin-right: 6px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 18px 6px;
+    margin-bottom: 18px;
+  }
+  .hint {
+    background: var(--hint-bg);
+    border: 1px solid var(--hint-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 10px 0 16px;
+    font-size: 0.9rem;
+  }
+  .hint + .hint { margin-top: -6px; }
+  .hint .tool { font-style: italic; color: var(--text-muted); margin-top: 6px; }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 520px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+  .dataset-block {
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .dataset-block h4 {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  button.reveal-btn {
+    display: block;
+    width: 100%;
+    margin: 18px 0 6px;
+    padding: 11px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-text);
+    transition: opacity 0.15s ease;
+  }
+  button.reveal-btn:disabled {
+    background: var(--btn-disabled-bg);
+    color: var(--btn-disabled-text);
+    cursor: not-allowed;
+  }
+  button.reveal-btn:not(:disabled):hover { opacity: 0.9; }
+  .hint-to-reveal {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: -4px 0 4px;
+    min-height: 1.1em;
+  }
+  .answer-box {
+    background: var(--answer-bg);
+    border: 1px solid var(--answer-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 10px 0 18px;
+    font-size: 0.95rem;
+    display: none;
+  }
+  .answer-box.show { display: block; }
+  .answer-box .label {
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--answer-border);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .answer-box p { margin: 0 0 10px; }
+  .answer-box p:last-child { margin-bottom: 0; }
+  .answer-box table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0 12px;
+    font-size: 0.88rem;
+  }
+  .answer-box th, .answer-box td {
+    border: 1px solid var(--answer-border);
+    padding: 6px 8px;
+    text-align: left;
+  }
+  .answer-box th { background: rgba(0,0,0,0.05); }
+  footer-note {
+    display: block;
+  }
+  .reset-row {
+    text-align: center;
+    margin-top: 30px;
+  }
+  .reset-row button {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .saved-indicator {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: -8px;
+    min-height: 1em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Boston Housing Equity — Interactive Worksheet</h1>
+  <p class="subtitle">Work through this on your own pace. Type your own answer first — the model answer for each question unlocks once you've written something.</p>
+
+  <div class="callout">
+    <b>Research question:</b> <em>“I am studying housing price trends across Boston neighborhoods because I want to find out whether rising prices are disproportionately displacing lower-income and minority residents, in order to inform the city's affordable housing and zoning policy decisions.”</em>
+  </div>
+
+  <label class="field-label" for="teamName">Your name (optional):</label>
+  <input type="text" id="teamName" placeholder="Type your name" />
+
+  <!-- ===================== QUESTION 1 ===================== -->
+  <div class="q-banner"><span class="num">Question 1:</span>What data does this question actually need?</div>
+  <div class="card">
+    <p>Don't try to list everything. Agree on just two data types you'd need to start this project — the most essential ones. Think at the level of “housing price data for Boston” or “income data for Boston” first — a general idea, not a specific dataset yet.</p>
+
+    <label class="field-label" for="data1">Data need #1:</label>
+    <input type="text" id="data1" placeholder="e.g., housing price data for Boston" />
+
+    <label class="field-label" for="data2">Data need #2:</label>
+    <input type="text" id="data2" placeholder="e.g., income data for Boston" />
+
+    <p style="margin-top:16px;">Now the harder problem: the question says “Boston neighborhoods,” but that's not a precise geographic unit — it's not something you can reliably find boundary files or data for. What's the actual geographic unit (tract? block group? ZIP code? official neighborhood?) you'd use instead, and why?</p>
+
+    <label class="field-label" for="geounit">Your reasoning:</label>
+    <textarea id="geounit" placeholder="Type your reasoning here..."></textarea>
+
+    <div class="hint-to-reveal" id="hint1"></div>
+    <button class="reveal-btn" id="revealBtn1" disabled>Reveal Model Answer</button>
+
+    <div class="answer-box" id="answer1">
+      <span class="label">Model Answer</span>
+      <p><b>Data need #1:</b> Housing price data for Boston (e.g., assessed property value or sale price)</p>
+      <p><b>Data need #2:</b> Income and demographic data for Boston (e.g., median household income, race/ethnicity)</p>
+      <p><b>Geographic unit:</b> “Boston neighborhoods” is not a unit you can reliably find data at. Most income, demographic, and even price data is published at the Census tract or block group level, not by informal neighborhood name. This project adopts <b>tract</b> as its working geographic unit — fine-grained enough to show variation within the city, and it's the unit the ACS data is actually published at.</p>
+      <p><b>Also reasonable:</b> block group, if you want finer spatial detail and are comfortable with noisier income estimates. ZIP code is usually a weaker choice since ZIP boundaries don't align well with Census demographic data.</p>
+    </div>
+  </div>
+
+  <!-- ===================== QUESTION 2 ===================== -->
+  <div class="q-banner"><span class="num">Question 2:</span>Where can you find it — and what does it actually look like?</div>
+  <div class="card">
+    <p>For your two data needs from Question 1, find one real source each (try ArcGIS Hub, data.census.gov, or Analyze Boston). Open or preview each dataset: What columns/fields does it have? What area does it cover? What geographic unit is it published at?</p>
+
+    <div class="dataset-block">
+      <h4>Dataset 1</h4>
+      <label class="field-label" for="source1">Source & dataset name:</label>
+      <input type="text" id="source1" placeholder="e.g., Analyze Boston — Property Assessment" />
+      <label class="field-label" for="columns1">Key columns found:</label>
+      <input type="text" id="columns1" placeholder="e.g., PID, assessed value, address" />
+      <div class="two-col">
+        <div>
+          <label class="field-label" for="coverage1">Geographic coverage:</label>
+          <input type="text" id="coverage1" placeholder="e.g., City of Boston" />
+        </div>
+        <div>
+          <label class="field-label" for="unit1">Geographic unit:</label>
+          <input type="text" id="unit1" placeholder="e.g., Parcel" />
+        </div>
+      </div>
+    </div>
+
+    <div class="dataset-block">
+      <h4>Dataset 2</h4>
+      <label class="field-label" for="source2">Source & dataset name:</label>
+      <input type="text" id="source2" placeholder="e.g., data.census.gov — ACS 5-year estimates" />
+      <label class="field-label" for="columns2">Key columns found:</label>
+      <input type="text" id="columns2" placeholder="e.g., GEOID, median household income" />
+      <div class="two-col">
+        <div>
+          <label class="field-label" for="coverage2">Geographic coverage:</label>
+          <input type="text" id="coverage2" placeholder="e.g., All U.S. tracts (filtered to Boston)" />
+        </div>
+        <div>
+          <label class="field-label" for="unit2">Geographic unit:</label>
+          <input type="text" id="unit2" placeholder="e.g., Census tract" />
+        </div>
+      </div>
+    </div>
+
+    <label class="field-label" for="matchNotes">Did the geographic unit of the real data match what you expected in Question 1? If not, what will you do?</label>
+    <textarea id="matchNotes" placeholder="Type your answer here..."></textarea>
+
+    <div class="hint-to-reveal" id="hint2"></div>
+    <button class="reveal-btn" id="revealBtn2" disabled>Reveal Model Answer</button>
+
+    <div class="answer-box" id="answer2">
+      <span class="label">Model Answer</span>
+      <table>
+        <tr><th></th><th>Source & dataset</th><th>Key columns</th><th>Coverage</th><th>Unit</th></tr>
+        <tr><td><b>Dataset 1</b></td><td>Analyze Boston – Property Assessment</td><td>PID / GIS_ID, assessed value, address, land use</td><td>City of Boston only</td><td>Parcel</td></tr>
+        <tr><td><b>Dataset 2</b></td><td>data.census.gov – ACS 5-year estimates</td><td>GEOID, median household income, race/ethnicity</td><td>All U.S. tracts (filtered to Boston)</td><td>Census tract</td></tr>
+      </table>
+      <p><b>Did the unit match?</b> No — Property Assessment data comes at the parcel level, but the ACS data is only available at the tract level. That's fine here: you don't need to force both datasets into one unit. You can build <b>two separate maps</b> — one showing property values at the parcel level, one showing income by census tract — and compare them side by side rather than aggregating one into the other.</p>
+      <p><b>Want to actually try this in ArcGIS Pro?</b> Here's real data you can download right now:</p>
+      <ul style="margin:0 0 10px; padding-left:20px;">
+        <li><b>Property Assessment (Excel/CSV, price data):</b> <a href="https://data.boston.gov/dataset/property-assessment" target="_blank" rel="noopener">data.boston.gov/dataset/property-assessment</a> — pick the latest fiscal year CSV</li>
+        <li><b>Parcels (shapefile, geometry):</b> <a href="https://data.boston.gov/dataset/parcels-2024" target="_blank" rel="noopener">data.boston.gov/dataset/parcels-2024</a> — download as Shapefile from the landing page</li>
+        <li><b>Income & demographic data (ACS tables):</b> <a href="https://data.census.gov" target="_blank" rel="noopener">data.census.gov</a> — search Table S1903 (income) or DP05 (race/ethnicity), filtered to Census Tract geography in Suffolk County, MA</li>
+        <li><b>Census tract boundaries (shapefile):</b> <a href="https://www.census.gov/cgi-bin/geo/shapefiles/index.php" target="_blank" rel="noopener">census.gov/cgi-bin/geo/shapefiles/index.php</a> — select a year, layer type "Census Tracts," and state Massachusetts</li>
+      </ul>
+      <p style="font-size:0.85rem; color:var(--text-muted);">Join fields once everything's loaded: Property Assessment → Parcels via <b>PID/GIS_ID</b>; ACS table → Tract boundaries via <b>GEOID</b>.</p>
+    </div>
+  </div>
+
+  <!-- ===================== QUESTION 3 ===================== -->
+  <div class="q-banner"><span class="num">Question 3:</span>What data prep will you need?</div>
+  <div class="card">
+    <p>Looking at the two datasets you just inspected, walk through these three checks to figure out what prep is needed before they could be combined into one map:</p>
+
+    <div class="hint">
+      <b>1. Geographic extent check</b> — Do your two layers cover the same spatial extent? If one covers all of Massachusetts and the other only Boston, you'll likely need to trim each layer down to the same study area.
+      <div class="tool">Potential tools: Clip, Select by Location, Query</div>
+    </div>
+    <label class="field-label" for="extentReasoning">Does this apply to your two datasets? What would you do?</label>
+    <textarea id="extentReasoning" placeholder="Type your answer here..."></textarea>
+
+    <div class="hint">
+      <b>2. Projection check</b> — Are your layers in the same coordinate system? Layers from different sources often aren't. In ArcGIS Pro, the map frame projects data on the fly based on the first layer loaded — if that first layer is already appropriately projected, others will usually display correctly without extra steps. Avoid permanently reprojecting a dataset as a routine fix; that changes the feature data itself.
+      <div class="tool">Potential tool (only if truly needed): Reproject / Project</div>
+    </div>
+    <label class="field-label" for="projectionReasoning">Does this apply to your two datasets? What would you do?</label>
+    <textarea id="projectionReasoning" placeholder="Type your answer here..."></textarea>
+
+    <div class="hint">
+      <b>3. Attribute check</b> — Is the attribute you actually need (e.g., income, price) already attached to the shapefile, or does it live in a separate table? If separate, you'll need to attach it using a shared ID field.
+      <div class="tool">Potential tool: Join</div>
+    </div>
+    <label class="field-label" for="attributeReasoning">Does this apply to your two datasets? What would you do?</label>
+    <textarea id="attributeReasoning" placeholder="Type your answer here..."></textarea>
+
+    <label class="field-label" for="mapDescription">Describe the map you could now create:</label>
+    <textarea id="mapDescription" placeholder="Type your answer here..."></textarea>
+
+    <div class="hint-to-reveal" id="hint3"></div>
+    <button class="reveal-btn" id="revealBtn3" disabled>Reveal Model Answer</button>
+
+    <div class="answer-box" id="answer3">
+      <span class="label">Model Answer</span>
+      <p><b>Geographic extent check:</b> Yes, this one applies. The Parcels layer already covers only the City of Boston, but the Census tract layer (and the ACS data joined to it) covers all of Suffolk County. You'll need to <b>clip</b> the tract layer down to Boston's city boundary so both layers cover the same study area.</p>
+      <p><b>Projection check:</b> Census TIGER/Line layers and Analyze Boston layers may ship in different coordinate systems. If the first layer loaded in ArcGIS Pro is already in a projection appropriate for Massachusetts/Boston (e.g., NAD 1983 State Plane Massachusetts), the other layers will typically display correctly without any extra step. No need to permanently reproject the source data unless a specific analysis tool requires it.</p>
+      <p><b>Attribute check:</b> Yes, this one applies to both datasets. The Property Assessment Excel/CSV must be <b>joined</b> to the Parcels shapefile using PID / GIS_ID. The ACS income table must be <b>joined</b> to the Census tract shapefile using GEOID. Neither comes pre-attached to its boundary layer — both need a join before you can map them.</p>
+      <p><b>Result — two maps:</b> Since the two datasets don't need to share one geographic unit, you don't need to aggregate anything. Build <b>Map 1</b>: Boston parcels symbolized by assessed property value (after joining Property Assessment to Parcels). Build <b>Map 2</b>: Boston census tracts symbolized by median household income (after joining the ACS table to the clipped tract layer and joining it with GEOID). Viewing them side by side lets you start comparing where prices are high against where income is lower — the groundwork for the fuller analysis later in the semester.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>Remember:</b> your own topic won't look exactly like this one. The point of this activity isn't the Boston specifics — it's the reasoning pattern: name your data, pin down a real geographic unit, inspect what you actually find, then reconcile extent, projection, and attributes before mapping.
+  </div>
+
+  <div class="reset-row">
+    <button id="resetBtn">Clear my answers</button>
+    <div class="saved-indicator" id="savedIndicator"></div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var PREFIX = "boston-activity-";
+  var textFields = ["teamName","data1","data2","geounit","source1","columns1","coverage1","unit1",
+    "source2","columns2","coverage2","unit2","matchNotes","extentReasoning","projectionReasoning",
+    "attributeReasoning","mapDescription"];
+
+  function loadField(id) {
+    try {
+      var v = localStorage.getItem(PREFIX + id);
+      if (v !== null) {
+        var el = document.getElementById(id);
+        if (el) el.value = v;
+      }
+    } catch (e) { /* storage unavailable, ignore */ }
+  }
+  function saveField(id) {
+    try {
+      var el = document.getElementById(id);
+      if (el) localStorage.setItem(PREFIX + id, el.value);
+      flashSaved();
+    } catch (e) { /* storage unavailable, ignore */ }
+  }
+  var savedTimeout;
+  function flashSaved() {
+    var ind = document.getElementById("savedIndicator");
+    if (!ind) return;
+    ind.textContent = "Saved locally in your browser";
+    clearTimeout(savedTimeout);
+    savedTimeout = setTimeout(function(){ ind.textContent = ""; }, 1500);
+  }
+
+  textFields.forEach(function (id) {
+    loadField(id);
+    var el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", function () {
+        saveField(id);
+        updateRevealButtons();
+      });
+    }
+  });
+
+  function filled(id) {
+    var el = document.getElementById(id);
+    return el && el.value.trim().length > 0;
+  }
+
+  function updateRevealButtons() {
+    var btn1 = document.getElementById("revealBtn1");
+    var ready1 = filled("data1") && filled("data2") && filled("geounit");
+    btn1.disabled = !ready1;
+    document.getElementById("hint1").textContent = ready1 ? "" : "Fill in both data needs and your geographic unit reasoning to unlock the model answer.";
+
+    var btn2 = document.getElementById("revealBtn2");
+    var ready2 = filled("source1") && filled("source2") && filled("matchNotes");
+    btn2.disabled = !ready2;
+    document.getElementById("hint2").textContent = ready2 ? "" : "Fill in both dataset sources and the match-check question to unlock the model answer.";
+
+    var btn3 = document.getElementById("revealBtn3");
+    var ready3 = filled("extentReasoning") && filled("projectionReasoning") && filled("attributeReasoning");
+    btn3.disabled = !ready3;
+    document.getElementById("hint3").textContent = ready3 ? "" : "Answer all three checks to unlock the model answer.";
+  }
+
+  document.getElementById("revealBtn1").addEventListener("click", function () {
+    document.getElementById("answer1").classList.add("show");
+    this.textContent = "Model Answer Revealed ✓";
+    this.disabled = true;
+  });
+  document.getElementById("revealBtn2").addEventListener("click", function () {
+    document.getElementById("answer2").classList.add("show");
+    this.textContent = "Model Answer Revealed ✓";
+    this.disabled = true;
+  });
+  document.getElementById("revealBtn3").addEventListener("click", function () {
+    document.getElementById("answer3").classList.add("show");
+    this.textContent = "Model Answer Revealed ✓";
+    this.disabled = true;
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    if (!confirm("Clear all your typed answers? This can't be undone.")) return;
+    try {
+      textFields.forEach(function (id) {
+        localStorage.removeItem(PREFIX + id);
+        var el = document.getElementById(id);
+        if (el) el.value = "";
+      });
+    } catch (e) { /* ignore */ }
+    ["answer1","answer2","answer3"].forEach(function(id){
+      document.getElementById(id).classList.remove("show");
+    });
+    ["revealBtn1","revealBtn2","revealBtn3"].forEach(function(id){
+      var b = document.getElementById(id);
+      b.textContent = "Reveal Model Answer";
+      b.disabled = true;
+    });
+    updateRevealButtons();
+  });
+
+  updateRevealButtons();
+})();
+</script>
+</body>
+</html>
