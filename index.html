@@ -345,16 +345,18 @@
 
     <div class="answer-box" id="answer2">
       <span class="label">Model Answer</span>
-      <table>
-        <tr><th></th><th>Source & dataset</th><th>Key columns</th><th>Coverage</th><th>Unit</th></tr>
-        <tr><td><b>Dataset 1</b></td><td>Analyze Boston – Property Assessment</td><td>PID / GIS_ID, assessed value, address, land use</td><td>City of Boston only</td><td>Parcel</td></tr>
-        <tr><td><b>Dataset 2</b></td><td>data.census.gov – ACS 5-year estimates</td><td>GEOID, median household income, race/ethnicity</td><td>All U.S. tracts (filtered to Boston)</td><td>Census tract</td></tr>
+    <table>
+        <tr><th></th><th>Source & dataset</th><th>Key columns</th><th>Coverage</th><th>Unit</th><th>Component</th></tr>
+        <tr><td><b>Dataset 1</b></td><td>Analyze Boston – Property Assessment</td><td>PID / GIS_ID, assessed value, address, land use</td><td>City of Boston only</td><td>Parcel</td><td>Non spatial attribute</td></tr>
+        <tr><td><b>Dataset 2</b></td><td>Analyze Boston parcel shapefile</td><td>Parcel ID</td><td>City of Boston only</td><td>Parcel</td><td>Geometry</td></tr>
+        <tr><td><b>Dataset 3</b></td><td>data.census.gov – ACS 5-year estimates</td><td>GEOID, median household income, race/ethnicity</td><td>All U.S. tracts (filtered to Suffolk County)</td><td>Census tract</td><td>Non spatial attribute</td></tr>
+        <tr><td><b>Dataset 4</b></td><td>TIGER shapefile</td><td>GEOID</td><td>Suffolk County</td><td>Tract</td><td>Geometry</td></tr>
       </table>
       <p><b>Did the unit match?</b> No — Property Assessment data comes at the parcel level, but the ACS data is only available at the tract level. That's fine here: you don't need to force both datasets into one unit. You can build <b>two separate maps</b> — one showing property values at the parcel level, one showing income by census tract — and compare them side by side rather than aggregating one into the other.</p>
       <p><b>Want to actually try this in ArcGIS Pro?</b> Here's real data you can download right now:</p>
       <ul style="margin:0 0 10px; padding-left:20px;">
         <li><b>Property Assessment (Excel/CSV, price data):</b> <a href="https://data.boston.gov/dataset/property-assessment" target="_blank" rel="noopener">data.boston.gov/dataset/property-assessment</a> — pick the latest fiscal year CSV</li>
-        <li><b>Parcels (shapefile, geometry):</b> <a href="https://data.boston.gov/dataset/parcels-2024" target="_blank" rel="noopener">data.boston.gov/dataset/parcels-2024</a> — download as Shapefile from the landing page</li>
+        <li><b>Parcels (shapefile, geometry):</b> <a href="https://bostonopendata-boston.opendata.arcgis.com/datasets/boston::parcels-2024/explore?location=42.312250%2C-71.029750%2C12" target="_blank" rel="noopener">data.boston.gov/dataset/parcels-2024</a> — download as Shapefile from the landing page</li>
         <li><b>Income & demographic data (ACS tables):</b> <a href="https://data.census.gov" target="_blank" rel="noopener">data.census.gov</a> — search Table S1903 (income) or DP05 (race/ethnicity), filtered to Census Tract geography in Suffolk County, MA</li>
         <li><b>Census tract boundaries (shapefile):</b> <a href="https://www.census.gov/cgi-bin/geo/shapefiles/index.php" target="_blank" rel="noopener">census.gov/cgi-bin/geo/shapefiles/index.php</a> — select a year, layer type "Census Tracts," and state Massachusetts</li>
       </ul>
