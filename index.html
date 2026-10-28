@@ -418,42 +418,16 @@
 
 <script>
 (function () {
-  var PREFIX = "boston-activity-";
   var textFields = ["teamName","data1","data2","geounit","source1","columns1","coverage1","unit1",
     "source2","columns2","coverage2","unit2","matchNotes","extentReasoning","projectionReasoning",
     "attributeReasoning","mapDescription"];
 
-  function loadField(id) {
-    try {
-      var v = localStorage.getItem(PREFIX + id);
-      if (v !== null) {
-        var el = document.getElementById(id);
-        if (el) el.value = v;
-      }
-    } catch (e) { /* storage unavailable, ignore */ }
-  }
-  function saveField(id) {
-    try {
-      var el = document.getElementById(id);
-      if (el) localStorage.setItem(PREFIX + id, el.value);
-      flashSaved();
-    } catch (e) { /* storage unavailable, ignore */ }
-  }
-  var savedTimeout;
-  function flashSaved() {
-    var ind = document.getElementById("savedIndicator");
-    if (!ind) return;
-    ind.textContent = "Saved locally in your browser";
-    clearTimeout(savedTimeout);
-    savedTimeout = setTimeout(function(){ ind.textContent = ""; }, 1500);
-  }
-
+  // Removed localStorage saving/loading so every page load starts fresh.
+  
   textFields.forEach(function (id) {
-    loadField(id);
     var el = document.getElementById(id);
     if (el) {
       el.addEventListener("input", function () {
-        saveField(id);
         updateRevealButtons();
       });
     }
@@ -499,13 +473,10 @@
 
   document.getElementById("resetBtn").addEventListener("click", function () {
     if (!confirm("Clear all your typed answers? This can't be undone.")) return;
-    try {
-      textFields.forEach(function (id) {
-        localStorage.removeItem(PREFIX + id);
-        var el = document.getElementById(id);
-        if (el) el.value = "";
-      });
-    } catch (e) { /* ignore */ }
+    textFields.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = "";
+    });
     ["answer1","answer2","answer3"].forEach(function(id){
       document.getElementById(id).classList.remove("show");
     });
