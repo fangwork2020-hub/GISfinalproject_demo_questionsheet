@@ -422,8 +422,26 @@
     "source2","columns2","coverage2","unit2","matchNotes","extentReasoning","projectionReasoning",
     "attributeReasoning","mapDescription"];
 
-  // Removed localStorage saving/loading so every page load starts fresh.
-  
+  // FORCE CLEAR: Wipes all text fields clean every time the page loads or is refreshed
+  window.addEventListener("pageshow", function () {
+    textFields.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    ["answer1","answer2","answer3"].forEach(function(id){
+      var box = document.getElementById(id);
+      if (box) box.classList.remove("show");
+    });
+    ["revealBtn1","revealBtn2","revealBtn3"].forEach(function(id){
+      var b = document.getElementById(id);
+      if (b) {
+        b.textContent = "Reveal Model Answer";
+        b.disabled = true;
+      }
+    });
+    updateRevealButtons();
+  });
+
   textFields.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) {
@@ -441,37 +459,49 @@
   function updateRevealButtons() {
     var btn1 = document.getElementById("revealBtn1");
     var ready1 = filled("data1") && filled("data2") && filled("geounit");
-    btn1.disabled = !ready1;
-    document.getElementById("hint1").textContent = ready1 ? "" : "Fill in both data needs and your geographic unit reasoning to unlock the model answer.";
+    if (btn1) {
+      btn1.disabled = !ready1;
+      document.getElementById("hint1").textContent = ready1 ? "" : "Fill in both data needs and your geographic unit reasoning to unlock the model answer.";
+    }
 
     var btn2 = document.getElementById("revealBtn2");
     var ready2 = filled("source1") && filled("source2") && filled("matchNotes");
-    btn2.disabled = !ready2;
-    document.getElementById("hint2").textContent = ready2 ? "" : "Fill in both dataset sources and the match-check question to unlock the model answer.";
+    if (btn2) {
+      btn2.disabled = !ready2;
+      document.getElementById("hint2").textContent = ready2 ? "" : "Fill in both dataset sources and the match-check question to unlock the model answer.";
+    }
 
     var btn3 = document.getElementById("revealBtn3");
     var ready3 = filled("extentReasoning") && filled("projectionReasoning") && filled("attributeReasoning");
-    btn3.disabled = !ready3;
-    document.getElementById("hint3").textContent = ready3 ? "" : "Answer all three checks to unlock the model answer.";
+    if (btn3) {
+      btn3.disabled = !ready3;
+      document.getElementById("hint3").textContent = ready3 ? "" : "Answer all three checks to unlock the model answer.";
+    }
   }
 
-  document.getElementById("revealBtn1").addEventListener("click", function () {
+  var r1 = document.getElementById("revealBtn1");
+  if (r1) r1.addEventListener("click", function () {
     document.getElementById("answer1").classList.add("show");
     this.textContent = "Model Answer Revealed ✓";
     this.disabled = true;
   });
-  document.getElementById("revealBtn2").addEventListener("click", function () {
+
+  var r2 = document.getElementById("revealBtn2");
+  if (r2) r2.addEventListener("click", function () {
     document.getElementById("answer2").classList.add("show");
     this.textContent = "Model Answer Revealed ✓";
     this.disabled = true;
   });
-  document.getElementById("revealBtn3").addEventListener("click", function () {
+
+  var r3 = document.getElementById("revealBtn3");
+  if (r3) r3.addEventListener("click", function () {
     document.getElementById("answer3").classList.add("show");
     this.textContent = "Model Answer Revealed ✓";
     this.disabled = true;
   });
 
-  document.getElementById("resetBtn").addEventListener("click", function () {
+  var resetB = document.getElementById("resetBtn");
+  if (resetB) resetB.addEventListener("click", function () {
     if (!confirm("Clear all your typed answers? This can't be undone.")) return;
     textFields.forEach(function (id) {
       var el = document.getElementById(id);
@@ -482,8 +512,10 @@
     });
     ["revealBtn1","revealBtn2","revealBtn3"].forEach(function(id){
       var b = document.getElementById(id);
-      b.textContent = "Reveal Model Answer";
-      b.disabled = true;
+      if (b) {
+        b.textContent = "Reveal Model Answer";
+        b.disabled = true;
+      }
     });
     updateRevealButtons();
   });
